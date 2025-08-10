@@ -1,1 +1,7 @@
 # oProjects
+
+Run npm install
+
+
+
+
