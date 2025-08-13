@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import './App.css'
-import NetworkingLab from './NetworkingLab'
 
 function App() {
   const [activeSection, setActiveSection] = useState('home')
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [selectedTool, setSelectedTool] = useState(null)
+  const [announcements, setAnnouncements] = useState([])
+  const [newAnnouncement, setNewAnnouncement] = useState('')
 
   // Company tools data with their respective URLs
   const companyTools = [
@@ -55,6 +56,17 @@ function App() {
       buttonText: "Open Networking Lab",
       links: [
         { name: "PNET Lab", url: "https://192.168.1.2/store/public/auth/login/offline?link=https%3A%2F%2F192.168.1.2%2Fstore%2Fpublic%2Fadmin%2Fmain%2Fview&error=&success=", icon: "🧪" }
+      ]
+    },
+    {
+      id: 5,
+      name: "VAPT",
+      description: "Vulnerability Assessment and Penetration Testing dashboard.",
+      icon: "🛡️", // Shield icon for security
+      buttonText: "Access VAPT",
+      mainUrl: "http://192.168.1.11:9392",
+      links: [
+        { name: "VAPT Dashboard", url: "http://192.168.1.11:9392", icon: "🛡️" }
       ]
     }
   ]
@@ -129,6 +141,40 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Load/save announcements to localStorage and seed test items once
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('identiqa_announcements')
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed)) {
+          setAnnouncements(parsed)
+          return
+        }
+      }
+    } catch {}
+    // Seed test announcements if none exist
+    const seed = [
+      { id: `a-${Date.now()-300000}`, text: 'APM portal 1.1 released with improved dashboards', ts: Date.now() - 300000 },
+      { id: `a-${Date.now()-180000}`, text: 'NMS: new SNMP templates for edge routers', ts: Date.now() - 180000 },
+      { id: `a-${Date.now()-60000}`, text: 'Networking Lab: fresh PNETLab practice set published', ts: Date.now() - 60000 }
+    ]
+    setAnnouncements(seed)
+    try { localStorage.setItem('identiqa_announcements', JSON.stringify(seed)) } catch {}
+  }, [])
+
+  useEffect(() => {
+    try { localStorage.setItem('identiqa_announcements', JSON.stringify(announcements)) } catch {}
+  }, [announcements])
+
+  const addAnnouncement = (text) => {
+    if (!text || !text.trim()) return
+    const item = { id: `a-${Date.now()}`, text: text.trim(), ts: Date.now() }
+    setAnnouncements((prev) => [item, ...prev])
+  }
+
+  const formatTs = (t) => new Date(t).toLocaleString()
+
   useEffect(() => {
     // Apply theme to body
     if (isDarkMode) {
@@ -145,10 +191,7 @@ function App() {
         <div className="nav-container">
           <div className="nav-logo">
             <div className="logo-container">
-              <div className="identiqa-logo">
-                <img src="/LOGO.png" alt="Identiqa Labs Logo" className="logo-img" />
-              </div>
-              <span className="logo-text">Identiqa Labs</span>
+              <img src="/identiqa_logo.png" alt="identiqa logo" className="identiqa-navbar-logo" />
             </div>
           </div>
           <div className={`nav-menu ${isMenuOpen ? 'active' : ''}`}>
@@ -157,7 +200,7 @@ function App() {
               className={`nav-link ${activeSection === 'home' ? 'active' : ''}`}
               onClick={() => scrollToSection('home')}
             >
-              Home
+              About Identiqa Labs
             </a>
             <a 
               href="#tools" 
@@ -165,6 +208,13 @@ function App() {
               onClick={() => scrollToSection('tools')}
             >
               Tools
+            </a>
+            <a 
+              href="#changelogs" 
+              className={`nav-link ${activeSection === 'changelogs' ? 'active' : ''}`}
+              onClick={() => scrollToSection('changelogs')}
+            >
+              Change Logs
             </a>
             <button className="theme-toggle" onClick={toggleTheme}>
               {isDarkMode ? '☀️' : '🌙'}
@@ -181,7 +231,7 @@ function App() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section (About Identiqa Labs) */}
       <section id="home" className="hero">
         <div className="hero-content">
           <div className="company-branding">
@@ -190,13 +240,30 @@ function App() {
                 <img src="/LOGO.png" alt="Identiqa Labs Logo" className="logo-img-large" />
               </div>
               <h1 className="company-name">Identiqa Labs</h1>
-      </div>
+            </div>
             <h2 className="application-title">Application Portfolio Management</h2>
             <p className="hero-description">
-              Comprehensive suite of tools for managing your IT infrastructure, 
-              services, and data governance needs.
-        </p>
-      </div>
+              Identiqa Labs is a research-and-delivery unit focused on building reliable, open‑source platforms for IT operations and data teams. We design, implement, and support solutions that help you observe, govern, and secure critical infrastructure at scale.
+            </p>
+            <p className="hero-description">
+              Our portfolio spans network monitoring and observability (Zabbix, Grafana, Nagios), IT service management, data governance and lineage, hands‑on networking labs with PNETLab, and vulnerability assessment workflows. We standardize on proven tools, wrap them with opinionated best practices, and tailor them to your environment.
+            </p>
+            <p className="hero-description">
+              We work outcome‑first: rapid discovery, architecture and hardening, automated deployments, and clear documentation with knowledge transfer. Whether on‑premises or cloud, we emphasize security, compliance, maintainability, and measurable performance improvements.
+            </p>
+            <p className="hero-description">
+              From CIOs aligning roadmaps to SRE/NOC/SOC and data platform teams running day‑to‑day operations, Identiqa Labs helps reduce meantime‑to‑detect, accelerate incident response, and unlock data‑driven decisions—while keeping total cost of ownership predictable.
+            </p>
+            <div className="opensource-slider-container">
+              <div className="opensource-slider">
+                <div className="opensource-slide"><img src="/zabbix.png" alt="Zabbix" className="opensource-logo" /><span>Zabbix</span></div>
+                <div className="opensource-slide"><img src="/putty.png" alt="PuTTY" className="opensource-logo" /><span>PuTTY</span></div>
+                <div className="opensource-slide"><img src="/grafana.png" alt="Grafana" className="opensource-logo" /><span>Grafana</span></div>
+                <div className="opensource-slide"><img src="/nagios.png" alt="Nagios" className="opensource-logo" /><span>Nagios</span></div>
+                <div className="opensource-slide"><img src="/pnet.png" alt="PNETLab" className="opensource-logo" /><span>PNETLab</span></div>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="scroll-indicator">
           <div className="scroll-arrow"></div>
@@ -219,14 +286,6 @@ function App() {
                 <div className="tool-content">
                   <h3 className="tool-name">{tool.name}</h3>
                   <div className="tool-button-container">
-                    <a 
-                      href={tool.mainUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="tool-button"
-                    >
-                      {tool.buttonText}
-                    </a>
                     <button 
                       className="tool-info-button"
                       onClick={() => openToolModal(tool)}
@@ -238,6 +297,34 @@ function App() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Change Logs Section */}
+      <section id="changelogs" className="changelogs-section">
+        <div className="changelogs-content">
+          <h2 className="changelogs-title">Change Logs</h2>
+          {/* Announcements ticker */}
+          {announcements.length > 0 && (
+            <div className="announcements-ticker">
+              <div className="announcements-ticker-header">Latest announcements</div>
+              <div className="announcements-ticker-track">
+                {[...announcements, ...announcements].map((a, idx) => (
+                  <div key={`${a.id}-${idx}`} className="announcements-ticker-item">
+                    <span>🗞️ {a.text}</span>
+                    <span className="announcements-timestamp">{formatTs(a.ts)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {/* Quick add (for testing/demo) */}
+          <ul className="changelog-list">
+            <li className="changelog-item">[13/08/2025 13:09] Lauching NMS tool soon.</li>
+            <li className="changelog-item">[Date] Test Case.</li>
+            <li className="changelog-item">[Date] Test Case.</li>
+            <li className="changelog-item">[Date] Test Case.</li>
+          </ul>
         </div>
       </section>
 
