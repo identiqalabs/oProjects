@@ -9,11 +9,9 @@ function App() {
   const [announcements, setAnnouncements] = useState([])
   const [newAnnouncement, setNewAnnouncement] = useState('')
 
-  // Company tools data with their respective URLs
   const companyTools = [
     {
       id: 1,
-      name: "NMS",
       description: "Identiqa NMS provides real-time network monitoring, device control, and performance optimization in a centralized dashboard.",
       icon: "/Nms_logo.png", // Uses image from public folder
       buttonText: "Access NMS",
@@ -60,7 +58,6 @@ function App() {
     },
     {
       id: 5,
-      name: "VAPT",
       description: "Vulnerability Assessment and Penetration Testing dashboard.",
       icon: "/Vapt_logo.png", // Uses image from public folder
       buttonText: "Access VAPT",
