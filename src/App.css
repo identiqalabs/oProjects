@@ -16,6 +16,7 @@
   --accent-color: #00d4ff;
   --accent-secondary: #0066cc;
   --link-hover: #00d4ff;
+  --navbar-height: 64px;
 }
 
 .dark-theme {
@@ -54,6 +55,15 @@ body {
   color: var(--text-primary);
   background-color: var(--bg-primary);
   transition: all 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* Guard against accidental horizontal overflow */
+html, body, #root, .App {
+  max-width: 100%;
+}
+#root, .App {
+  overflow-x: hidden;
 }
 
 .container {
@@ -71,6 +81,7 @@ body {
   backdrop-filter: blur(10px);
   z-index: 1000;
   padding: 1rem 0;
+  min-height: var(--navbar-height);
   transition: all 0.3s ease;
   border-bottom: 1px solid var(--border-color);
   animation: slideDown 0.6s ease-out;
@@ -308,6 +319,7 @@ body {
 
 .hero-content {
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   padding: 0 20px;
   text-align: center;
@@ -318,7 +330,31 @@ body {
 
 .company-branding {
   max-width: 800px;
+  width: 100%;
   margin: 0 auto;
+  padding: 0 8px;
+}
+
+/* Ensure hero branding never overflows horizontally */
+.company-branding,
+.company-logo,
+.company-name,
+.application-title {
+  max-width: 100%;
+}
+
+.company-logo {
+  flex-wrap: wrap;
+}
+
+.company-logo > * {
+  min-width: 0;
+}
+
+.company-name,
+.application-title {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .company-logo {
@@ -378,7 +414,7 @@ body {
 }
 
 .company-name {
-  font-size: 3rem;
+  font-size: clamp(2rem, 2vw + 1.5rem, 3rem);
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
@@ -395,7 +431,7 @@ body {
 }
 
 .application-title {
-  font-size: 2.5rem;
+  font-size: clamp(1.4rem, 1.5vw + 1rem, 2.2rem);
   font-weight: 600;
   color: var(--accent-color);
   margin-bottom: 1.5rem;
@@ -408,7 +444,7 @@ body {
 }
 
 .hero-description {
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 1vw + 0.75rem, 1.15rem);
   color: var(--text-secondary);
   margin-bottom: 2rem;
   line-height: 1.8;
@@ -450,10 +486,11 @@ body {
 /* Section Styles */
 section {
   padding: 5rem 0;
+  scroll-margin-top: var(--navbar-height);
 }
 
 .section-title {
-  font-size: 2.5rem;
+  font-size: clamp(1.6rem, 1.8vw + 1rem, 2.3rem);
   font-weight: 700;
   text-align: center;
   margin-bottom: 1rem;
@@ -504,7 +541,7 @@ section {
 
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 2rem;
   margin-top: 3rem;
   position: relative;
@@ -581,6 +618,20 @@ section {
   font-size: 4rem;
   display: block;
   transition: all 0.3s ease;
+}
+
+/* Image-based icons for tools */
+.icon-img {
+  width: 104px;
+  height: 104px;
+  object-fit: contain;
+  display: inline-block;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.1));
+}
+
+.icon-img--large {
+  width: 124px;
+  height: 124px;
 }
 
 .tool-card:hover .tool-icon .icon {
@@ -785,6 +836,13 @@ section {
 .modal-icon {
   font-size: 2.5rem;
   animation: bounceIn 0.6s ease-out 0.3s both;
+}
+
+.modal-icon-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-right: 0.25rem;
 }
 
 @keyframes bounceIn {
@@ -1012,6 +1070,14 @@ section {
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+  :root { --navbar-height: 60px; }
+}
+
+@media (max-width: 1024px) {
+  .tools-grid { gap: 1.5rem; }
+}
+
 @media (max-width: 768px) {
   .hamburger {
     display: flex;
@@ -1019,14 +1085,16 @@ section {
 
   .nav-menu {
     position: fixed;
-    top: 100%;
+    top: var(--navbar-height);
     left: 0;
     width: 100%;
     background: var(--bg-primary);
     flex-direction: column;
     padding: 2rem;
     box-shadow: 0 4px 15px var(--shadow-color);
-    transform: translateY(-100%);
+    height: calc(100vh - var(--navbar-height));
+    overflow-y: auto;
+    transform: translateY(-8px);
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -1097,15 +1165,32 @@ section {
   .modal-icon {
     font-size: 2rem;
   }
+
+  /* Stack and center hero items on small screens */
+  .company-logo {
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+  .company-name,
+  .application-title {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .hero-content { padding: 0 16px; }
+  .company-branding { padding: 0 8px; }
 }
 
 @media (max-width: 480px) {
   .company-name {
-    font-size: 2rem;
+    font-size: 1.7rem;
   }
 
   .application-title {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
   }
 
   .section-title {
@@ -1125,8 +1210,8 @@ section {
   }
 
   .identiqa-logo-large {
-    width: 60px;
-    height: 60px;
+    width: 52px;
+    height: 52px;
   }
 
   .modal-content {
@@ -1153,6 +1238,16 @@ section {
   .modal-link {
     padding: 10px 16px;
   }
+  .scroll-indicator { display: none; }
+  :root { --navbar-height: 56px; }
+  .opensource-slider { gap: 1.25rem; }
+  .opensource-slide { min-width: 96px; max-width: 110px; }
+  .opensource-logo { width: 52px; height: 52px; }
+  /* Compact navbar and hero for very small widths */
+  .nav-container { padding: 0 12px; }
+  .identiqa-navbar-logo { width: 100px; }
+  .hero-content { padding: 0 12px; }
+  .company-branding { padding: 0 8px; }
 }
 
 /* Animations */

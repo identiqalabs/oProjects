@@ -9,13 +9,11 @@ function App() {
   const [announcements, setAnnouncements] = useState([])
   const [newAnnouncement, setNewAnnouncement] = useState('')
 
-  // Company tools data with their respective URLs
   const companyTools = [
     {
       id: 1,
-      name: "NMS",
       description: "Identiqa NMS provides real-time network monitoring, device control, and performance optimization in a centralized dashboard.",
-      icon: "🌐", // Network icon
+      icon: "/Nms_logo.png", // Uses image from public folder
       buttonText: "Access NMS",
       mainUrl: "http://192.168.1.25/zabbix/", // Primary URL for the main button
       links: [
@@ -60,9 +58,8 @@ function App() {
     },
     {
       id: 5,
-      name: "VAPT",
       description: "Vulnerability Assessment and Penetration Testing dashboard.",
-      icon: "🛡️", // Shield icon for security
+      icon: "/Vapt_logo.png", // Uses image from public folder
       buttonText: "Access VAPT",
       mainUrl: "http://192.168.1.11:9392",
       links: [
@@ -175,6 +172,10 @@ function App() {
 
   const formatTs = (t) => new Date(t).toLocaleString()
 
+  const isImageIcon = (icon) => {
+    return typeof icon === 'string' && /\.(png|jpe?g|gif|svg)$/i.test(icon)
+  }
+
   useEffect(() => {
     // Apply theme to body
     if (isDarkMode) {
@@ -281,10 +282,20 @@ function App() {
             {companyTools.map((tool) => (
               <div key={tool.id} className="tool-card">
                 <div className="tool-icon">
-                  <span className="icon">{tool.icon}</span>
+                  {isImageIcon(tool.icon) ? (
+                    <img
+                      src={tool.icon}
+                      alt={`${tool.name} logo`}
+                      className={`icon-img ${tool.name === 'NMS' || tool.name === 'VAPT' ? 'icon-img--large' : ''}`}
+                    />
+                  ) : (
+                    <span className="icon">{tool.icon}</span>
+                  )}
                 </div>
                 <div className="tool-content">
-                  <h3 className="tool-name">{tool.name}</h3>
+                  {!(tool && (tool.name === 'NMS' || tool.name === 'VAPT')) && (
+                    <h3 className="tool-name">{tool.name}</h3>
+                  )}
                   <div className="tool-button-container">
                     <button 
                       className="tool-info-button"
@@ -334,7 +345,11 @@ function App() {
           <div className="modal-content">
             <div className="modal-header">
               <div className="modal-title">
-                <span className="modal-icon">{selectedTool.icon}</span>
+                {isImageIcon(selectedTool.icon) ? (
+                  <img src={selectedTool.icon} alt={`${selectedTool.name} logo`} className="modal-icon-img" />
+                ) : (
+                  <span className="modal-icon">{selectedTool.icon}</span>
+                )}
                 <h2>{selectedTool.name}</h2>
               </div>
               <button className="modal-close" onClick={closeToolModal}>
