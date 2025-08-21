@@ -11,7 +11,6 @@ on:
 
 jobs:
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     permissions:
@@ -38,8 +37,8 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ASHY_SAND_06743A400 }}
           action: "upload"
-          app_location: "/"       # Root of your repo
-          output_location: "dist" # ✅ Vite outputs to dist
+          app_location: "/"       # Root of repo
+          output_location: "dist" # Vite build output
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
