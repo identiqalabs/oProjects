@@ -3,41 +3,40 @@ name: Azure Static Web Apps CI/CD
 on:
   push:
     branches:
-      - main
+      - main   # change if your default branch is different
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
 
 jobs:
-  build_and_deploy_job:
+  build_and_deploy:
     runs-on: ubuntu-latest
+    name: Build and Deploy
     steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: true
-          lfs: false
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: 18
+          cache: npm
 
       - name: Install dependencies
         run: npm install --include=dev
 
-      - name: Fix vite binary permissions
-        run: chmod +x ./node_modules/.bin/vite
+      - name: Build project
+        run: npm run build
 
-      - name: Build And Deploy
-        id: builddeploy
+      - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_PEBBLE_05FF94510 }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          action: "upload"
-          app_location: "/" 
-          api_location: ""
-          output_location: "dist"
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }} # Required for PR comments
+          action: upload
+          app_location: "/"       # where your source code lives
+          output_location: "dist" # where vite build outputs files
           app_build_command: npm run build
           skip_app_build: true
 
@@ -53,6 +52,7 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_PEBBLE_05FF94510 }}
           action: "close"
+
 
 
 
