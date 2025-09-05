@@ -11,9 +11,7 @@ on:
 
 jobs:
   build_and_deploy_job:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
     steps:
       - uses: actions/checkout@v3
         with:
@@ -24,6 +22,12 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Install dependencies
+        run: npm install --include=dev
+
+      - name: Fix vite binary permissions
+        run: chmod +x ./node_modules/.bin/vite
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
@@ -31,9 +35,11 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_PEBBLE_05FF94510 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          app_location: "/"   # Root of repo
-          api_location: ""    # No API
-          output_location: "dist"  # Vite build output
+          app_location: "/" 
+          api_location: ""
+          output_location: "dist"
+          app_build_command: npm run build
+
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -46,5 +52,6 @@ jobs:
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_PEBBLE_05FF94510 }}
           action: "close"
+
 
 
